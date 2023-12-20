@@ -1,7 +1,7 @@
 import Pkg
 Pkg.activate(dirname(@__DIR__))
 Pkg.instantiate()
-
+Pkg.add("Plots")
 # load packages
 using XLSX
 using StatsBase
@@ -69,5 +69,5 @@ plot!(y_pred[:, 1:10], color=:grey, alpha=0.2, label=:false)
 
 discount_factor = exp.(-mapslices(cumsum, y_pred ./ 100; dims=1))
 exp_ce_df = mapslices(mean, discount_factor; dims=2)
-exp_ce_rate = [100 * (exp_df[t-1] / exp_df[t] - 1) for t=2:length(exp_df)]
+exp_ce_rate = [100 * (exp_ce_df[t-1] / exp_ce_df[t] - 1) for t=2:length(exp_ce_df)]
 plot(2023:2121, exp_ce_rate)
