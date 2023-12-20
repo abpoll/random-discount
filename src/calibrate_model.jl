@@ -1,7 +1,7 @@
 import Pkg
 Pkg.activate(dirname(@__DIR__))
 Pkg.instantiate()
-Pkg.add("Plots")
+
 # load packages
 using XLSX
 using StatsBase
@@ -10,6 +10,8 @@ using Turing
 using Plots
 using StatsPlots
 using Optim
+using CSV
+using Tables
 
 # read data
 root_dir = dirname(@__DIR__)
@@ -65,9 +67,12 @@ for t = 1:size(y_pred, 1)
 end
 
 plot(qs[2, :], ribbon=(qs[2, :] .- qs[1, :], qs[3, :] .- qs[2, :]))
-plot!(y_pred[:, 1:10], color=:grey, alpha=0.2, label=:false)
+plot!(y_pred[:, 1:100], color=:grey, alpha=0.2, label=:false)
 
 discount_factor = exp.(-mapslices(cumsum, y_pred ./ 100; dims=1))
 exp_ce_df = mapslices(mean, discount_factor; dims=2)
 exp_ce_rate = [100 * (exp_ce_df[t-1] / exp_ce_df[t] - 1) for t=2:length(exp_ce_df)]
 plot(2023:2121, exp_ce_rate)
+
+# write y_pred
+CSV.write("data/dr_chains.csv", Tables.table(y_pred), writeheader=false)
